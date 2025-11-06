@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Online Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Global Header -->
+  <div data-include="partials/header.html"></div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <h1>Discover Your Next Favorite Book</h1>
+        <p>Search across Bangla & English titles. Read instantly in your browser.</p>
+        <a href="#search" class="btn primary">Start Reading</a>
+      </div>
+      <div class="hero-art" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container main">
+    <!-- Search -->
+    <section id="search" class="search-block card">
+      <h2>Search the Library</h2>
+      <form id="searchForm" class="search-form" onsubmit="return false;">
+        <input id="searchInput" type="text" placeholder="Search by title, author, or description…" />
+        <button id="searchBtn" class="btn">Search</button>
+      </form>
+      <div id="searchMeta" class="search-meta"></div>
+    </section>
+
+    <!-- Popular (Random) -->
+    <section id="popular" class="shelf">
+      <div class="shelf-head">
+        <h2>Popular right now</h2>
+        <button class="btn ghost" id="refreshPopular">Refresh</button>
+      </div>
+      <div id="popularGrid" class="grid"></div>
+    </section>
+
+    <!-- All Books (Sort + Pagination) -->
+    <section id="all-books" class="all-books">
+      <div class="controls card">
+        <div class="sort">
+          <label for="sortSelect">Sort by:</label>
+          <select id="sortSelect">
+            <option value="title|asc">Title (A → Z)</option>
+            <option value="title|desc">Title (Z → A)</option>
+            <option value="author|asc">Author (A → Z)</option>
+            <option value="author|desc">Author (Z → A)</option>
+            <option value="id|asc">Newest (Old → New)</option>
+            <option value="id|desc" selected>Newest (New → Old)</option>
+          </select>
+        </div>
+        <div class="page-size">
+          <label for="pageSizeSelect">Per page:</label>
+          <select id="pageSizeSelect">
+            <option>6</option>
+            <option>12</option>
+            <option selected>18</option>
+            <option>24</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="booksGrid" class="grid"></div>
+
+      <div class="pagination" id="pagination"></div>
+    </section>
+  </main>
+
+  <!-- Global Footer -->
+  <div data-include="partials/footer.html"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
