@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Read Book</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Add PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+
+  <main class="container">
+    <div id="bookDetails" class="book-details">
+      <div class="book-meta">
+        <h1 id="bookTitle">Loading...</h1>
+        <p id="bookAuthor"></p>
+        <p id="bookDesc"></p>
+        <div class="book-actions">
+          <button id="backBtn" class="btn ghost">← Back to Library</button>
+          <a id="downloadBtn" class="btn">Download PDF</a>
+          <div class="pdf-controls">
+            <button id="prevPage" class="btn ghost small">Previous</button>
+            <span id="pageInfo">Page: <span id="currentPage">1</span> / <span id="totalPages">0</span></span>
+            <button id="nextPage" class="btn ghost small">Next</button>
+            <input type="number" id="pageJump" placeholder="Go to page" min="1" style="width: 80px; padding: 5px; background: #0b1224; color: var(--text); border: 1px solid var(--stroke); border-radius: 5px;">
+            <button id="goToPage" class="btn ghost small">Go</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pdf-viewer">
+        <canvas id="pdfCanvas"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <div data-include="partials/footer.html"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
