@@ -1,3 +1,4 @@
+/* ===== CSS VARIABLES ===== */
 :root {
   --bg: #ffffff;
   --card: #f8fafc;
@@ -7,9 +8,11 @@
   --brand-2: #60a5fa;
   --accent: #06b6d4;
   --stroke: #e2e8f0;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+/* ===== BASE STYLES ===== */
 * {
   box-sizing: border-box;
 }
@@ -19,7 +22,7 @@ body {
   padding: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   height: 100%;
   line-height: 1.6;
 }
@@ -28,13 +31,13 @@ img {
   max-width: 100%;
 }
 
-/* Layout helpers */
+/* ===== LAYOUT UTILITIES ===== */
 .container {
   width: min(1200px, 92%);
   margin-inline: auto;
 }
 
-/* Header */
+/* ===== HEADER STYLES ===== */
 .site-header {
   position: sticky;
   top: 0;
@@ -92,7 +95,7 @@ img {
   color: var(--brand);
 }
 
-/* Hero */
+/* ===== HERO SECTION ===== */
 .hero {
   padding: 80px 0 60px;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
@@ -133,7 +136,7 @@ img {
   opacity: 0.7;
 }
 
-/* Buttons */
+/* ===== BUTTON STYLES ===== */
 .btn {
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
   color: white;
@@ -174,7 +177,7 @@ img {
   font-size: 14px;
 }
 
-/* Cards & grids */
+/* ===== CARD & GRID STYLES ===== */
 .card {
   background: var(--card);
   border: 1px solid var(--stroke);
@@ -184,88 +187,185 @@ img {
 }
 .grid {
   display: grid;
-  gap: 24px;
+  gap: 30px;
   margin-top: 20px;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));
+  justify-items: center;
 }
 
+/* ===== BOOK CARD STYLES ===== */
 .book-card {
+  width: 252px;
+  height: 365px;
   background: white;
-  border: 1px solid var(--stroke);
-  border-radius: 16px;
-  overflow: hidden;
+  border-radius: 30px;
+  box-shadow: 15px 15px 30px #bebebe, -15px -15px 30px #ffffff;
+  transition: 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow);
+  overflow: hidden;
   position: relative;
 }
+
 .book-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px) scale(1.02);
 }
+
+/* Book cover section with enhanced hover zoom */
 .book-card .cover {
-  aspect-ratio: 3/4;
-  background: #f1f5f9;
-  border-bottom: 1px solid var(--stroke);
+  width: 100%;
+  height: 50%;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  background: linear-gradient(135deg, #e66465, #9198e5);
   position: relative;
   overflow: hidden;
 }
+
 .book-card .cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease-in-out, filter 0.3s ease;
 }
+
 .book-card:hover .cover img {
-  transform: scale(1.05);
+  transform: scale(1.15);
+  filter: brightness(1.1);
 }
+
+/* Book content section */
 .book-card .meta {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
   flex-grow: 1;
+  gap: 12px;
+  transition: transform 0.3s ease;
 }
+
+.book-card:hover .meta {
+  transform: translateY(-5px);
+}
+
 .book-card .title {
-  font-size: 18px;
-  line-height: 1.3;
-  margin: 0;
+  font-family: "Inter", "Lucida Sans", sans-serif;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--text);
+  color: black;
+  margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  --webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.3;
+  transition: color 0.3s ease;
 }
+
+.book-card:hover .title {
+  color: var(--brand);
+}
+
 .book-card .author {
-  color: var(--muted);
-  font-size: 14px;
+  font-family: "Inter", "Lucida Sans", sans-serif;
+  color: #999999;
+  font-size: 13px;
   margin: 0;
   font-weight: 500;
 }
+
 .book-card .desc {
-  color: #475569;
-  font-size: 14px;
+  color: #666;
+  font-size: 12px;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  --webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex-grow: 1;
 }
-.book-card .actions {
+
+/* Read button with enhanced hover */
+.book-actions {
+  margin-top: auto;
   display: flex;
   gap: 8px;
-  margin-top: 16px;
-}
-.book-card .actions .btn {
-  flex: 1;
-  justify-content: center;
 }
 
-/* Sections */
+.book-actions .btn {
+  flex: 1;
+  justify-content: center;
+  font-size: 12px;
+  padding: 10px 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-actions .btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.book-card:hover .book-actions .btn::before {
+  left: 100%;
+}
+
+.book-card:hover .book-actions .btn {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Category tag */
+.book-category {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: #e3fff9;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: fit-content;
+  transition: all 0.3s ease;
+}
+
+.book-card:hover .book-category {
+  background-color: var(--brand);
+  transform: translateX(5px);
+}
+
+.book-card:hover .book-category svg {
+  fill: white;
+}
+
+.book-category .span {
+  margin-left: 6px;
+  font-family: "Inter", "Lucida Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #9198e5;
+  transition: color 0.3s ease;
+}
+
+.book-card:hover .book-category .span {
+  color: white;
+}
+
+/* ===== SEARCH SECTION STYLES ===== */
 .search-block h2 {
   margin: 0 0 16px;
   font-size: 28px;
@@ -298,6 +398,7 @@ img {
   font-size: 14px;
 }
 
+/* ===== SHELF SECTION STYLES ===== */
 .shelf {
   margin: 60px 0;
 }
@@ -314,6 +415,7 @@ img {
   color: var(--text);
 }
 
+/* ===== CONTROLS STYLES ===== */
 .controls {
   display: flex;
   gap: 20px;
@@ -345,7 +447,7 @@ img {
   outline: none;
 }
 
-/* Pagination */
+/* ===== PAGINATION STYLES ===== */
 .pagination {
   display: flex;
   gap: 8px;
@@ -380,10 +482,12 @@ img {
   font-size: 14px;
 }
 
-/* Book Page Styles */
+/* ===== BOOK PAGE STYLES ===== */
+/* ===== BOOK PAGE STYLES ===== */
 .book-details {
   margin: 40px 0;
   min-height: calc(100vh - 200px);
+  position: relative;
 }
 
 .book-meta {
@@ -393,6 +497,7 @@ img {
   margin-bottom: 32px;
   border: 1px solid var(--stroke);
   box-shadow: var(--shadow);
+  position: relative;
 }
 
 .book-meta h1 {
@@ -400,6 +505,7 @@ img {
   color: var(--text);
   font-size: 36px;
   font-weight: 700;
+  padding-right: 180px; /* Space for download button */
 }
 
 .book-meta #bookAuthor {
@@ -422,15 +528,103 @@ img {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-/* PDF Viewer Styles */
+/* Download button positioned top right */
+#downloadBtn {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#downloadBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+}
+
+/* Blueish gradient navigation buttons */
+.pdf-controls .btn.ghost.small {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  color: var(--brand);
+  border: 1px solid #bae6fd;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pdf-controls .btn.ghost.small:hover {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: white;
+  border-color: var(--brand);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Bottom controls with same styling */
+.pdf-controls.bottom-controls .btn.ghost.small {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  color: var(--brand);
+  border: 1px solid #bae6fd;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pdf-controls.bottom-controls .btn.ghost.small:hover {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: white;
+  border-color: var(--brand);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Back button styling */
+#backBtn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--stroke);
+  transition: all 0.3s ease;
+}
+
+#backBtn:hover {
+  background: var(--card);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ===== PDF VIEWER STYLES ===== */
 .pdf-controls {
   display: flex;
   gap: 12px;
   align-items: center;
   margin-top: 16px;
   flex-wrap: wrap;
+}
+
+/* Bottom PDF Controls */
+.pdf-controls.bottom-controls {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding: 15px;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  justify-content: center;
+  position: sticky;
+  bottom: 10px;
+  z-index: 10;
 }
 
 .pdf-controls span {
@@ -461,19 +655,67 @@ img {
   background: white;
   min-height: 600px;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   padding: 24px;
   box-shadow: var(--shadow);
+  position: relative;
 }
 
 #pdfCanvas {
   max-width: 100%;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  margin-bottom: 20px;
 }
 
-/* Footer */
+/* Make bottom controls responsive */
+@media (max-width: 768px) {
+  .book-meta h1 {
+    padding-right: 0;
+    margin-bottom: 80px; /* Space for download button on mobile */
+  }
+
+  #downloadBtn {
+    position: static;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pdf-controls.bottom-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 12px;
+    background: rgba(248, 250, 252, 0.95);
+    backdrop-filter: blur(8px);
+  }
+
+  .pdf-viewer {
+    padding-bottom: 80px; /* Extra space for fixed bottom controls */
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pdf-controls.bottom-controls {
+    padding: 10px;
+  }
+}
+
+/* ===== FOOTER STYLES ===== */
 .site-footer {
   border-top: 1px solid var(--stroke);
   margin-top: 80px;
@@ -506,7 +748,7 @@ img {
   color: var(--brand);
 }
 
-/* Responsiveness */
+/* ===== RESPONSIVE STYLES ===== */
 @media (max-width: 900px) {
   .hero-inner {
     grid-template-columns: 1fr;
@@ -526,34 +768,34 @@ img {
   .book-actions {
     flex-direction: column;
   }
-  
+
   .book-actions .btn {
     text-align: center;
   }
-  
+
   .pdf-controls {
     justify-content: center;
   }
-  
+
   .pdf-viewer {
     padding: 16px;
     min-height: 400px;
   }
-  
+
   #pdfCanvas {
     max-width: 95%;
   }
-  
+
   .footer-inner {
     flex-direction: column;
     text-align: center;
     gap: 20px;
   }
-  
+
   .hero-text h1 {
     font-size: 36px;
   }
-  
+
   .shelf h2 {
     font-size: 28px;
   }
@@ -564,34 +806,64 @@ img {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .nav {
     gap: 16px;
   }
-  
+
   .book-meta {
     padding: 24px;
   }
-  
+
   .pdf-viewer {
     min-height: 300px;
   }
-  
+
   #pdfCanvas {
     max-width: 100%;
   }
-  
+
   .pdf-controls {
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .search-form {
     flex-direction: column;
   }
-  
+
   .grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+}
+
+/* Page jump input styling - White version */
+#pageJump,
+#pageJumpBottom {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--stroke);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  width: 90px;
+  text-align: center;
+}
+
+#pageJump:focus,
+#pageJumpBottom:focus {
+  background: white;
+  border-color: var(--brand);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+#pageJump::placeholder,
+#pageJumpBottom::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+  text-align: center;
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Read Book</title>
+  <title>Books</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
   <!-- Add PDF.js -->
@@ -20,6 +20,7 @@
         <div class="book-actions">
           <button id="backBtn" class="btn ghost">← Back to Library</button>
           <a id="downloadBtn" class="btn">Download PDF</a>
+          <!-- Top Navigation -->
           <div class="pdf-controls">
             <button id="prevPage" class="btn ghost small">Previous</button>
             <span id="pageInfo">Page: <span id="currentPage">1</span> / <span id="totalPages">0</span></span>
@@ -32,6 +33,15 @@
       
       <div class="pdf-viewer">
         <canvas id="pdfCanvas"></canvas>
+        
+        <!-- Bottom Navigation -->
+        <div class="pdf-controls bottom-controls">
+          <button id="prevPageBottom" class="btn ghost small">Previous</button>
+          <span id="pageInfoBottom">Page: <span id="currentPageBottom">1</span> / <span id="totalPagesBottom">0</span></span>
+          <button id="nextPageBottom" class="btn ghost small">Next</button>
+          <input type="number" id="pageJumpBottom" placeholder="Go to page" min="1" style="width: 80px; padding: 5px; background: #0b1224; color: var(--text); border: 1px solid var(--stroke); border-radius: 5px;">
+          <button id="goToPageBottom" class="btn ghost small">Go</button>
+        </div>
       </div>
     </div>
   </main>
