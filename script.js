@@ -10,6 +10,61 @@ async function includePartials() {
         el.innerHTML = await res.text();
       } catch (error) {
         console.error("Error loading partial:", error);
+        // Fallback content
+        if (path.includes('header')) {
+          el.innerHTML = `
+            <header class="site-header">
+              <div class="container header-inner">
+                <div class="brand">
+                  <div class="logo-container">
+                    <img src="images/logo.svg" alt="Library Logo" class="logo" 
+                         onerror="this.src='images/default-logo.webp'; this.onerror=null;">
+                    <div class="logo-fallback">📚</div>
+                  </div>
+                  <div class="brand-text">
+                    <span class="brand-name">Online Library</span>
+                    <span class="brand-tagline">Read . Learn . Grow</span>
+                  </div>
+                </div>
+
+                <nav class="nav">
+                  <a href="/" class="nav-link">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Home</span>
+                  </a>
+                  <a href="#popular" class="nav-link">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Popular</span>
+                  </a>
+                  <a href="#all-books" class="nav-link">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">All Books</span>
+                  </a>
+                </nav>
+              </div>
+            </header>
+          `;
+        }
+        if (path.includes('footer')) {
+          el.innerHTML = `
+            <footer class="site-footer">
+              <div class="container footer-inner">
+                <div class="footer-brand">
+                  <div class="logo small">📚</div>
+                  <span>Online Library</span>
+                </div>
+                <div class="footer-links">
+                  <a href="#">About</a>
+                  <a href="#">Contact</a>
+                  <a href="#">Privacy</a>
+                </div>
+                <div class="footer-copyright">
+                  © <span id="year">${new Date().getFullYear()}</span> Online Library
+                </div>
+              </div>
+            </footer>
+          `;
+        }
       }
     })
   );
@@ -26,7 +81,70 @@ function el(tag, className = "", html = "") {
 }
 
 function imgOrPlaceholder(path) {
-  return path && path.trim() ? path : "images/placeholders/cover-default.jpg";
+  return path && path.trim() ? path : "https://via.placeholder.com/280x320/3b82f6/ffffff?text=No+Cover";
+}
+
+// ---------- Header Scroll Effect ----------
+function initHeaderScroll() {
+  const header = document.querySelector('.site-header');
+  if (header) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
+}
+
+// ---------- Hero Carousel Functionality ----------
+function initHeroCarousel() {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.dot');
+  
+  let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(n) {
+    // Hide all slides
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    // Show current slide
+    currentSlide = (n + slides.length) % slides.length;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+  }
+
+  function nextSlide() {
+    showSlide(currentSlide + 1);
+  }
+
+  // Auto slide
+  function startAutoSlide() {
+    slideInterval = setInterval(nextSlide, 3000);
+  }
+
+  // Event listeners for dots only
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      showSlide(index);
+      // Reset auto-slide timer when manually clicking dots
+      clearInterval(slideInterval);
+      startAutoSlide();
+    });
+  });
+
+  // Pause auto-slide on hover
+  const carousel = document.querySelector('.hero-carousel');
+  if (carousel) {
+    carousel.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    carousel.addEventListener('mouseleave', startAutoSlide);
+  }
+
+  // Start auto-slide
+  startAutoSlide();
 }
 
 // ---------- Renderers ----------
@@ -34,17 +152,13 @@ function renderBookCard(book) {
   const card = el("article", "book-card");
   card.innerHTML = `
     <div class="cover">
-      <img src="${imgOrPlaceholder(book.image_path)}" alt="${
-    book.title
-  }" onerror="this.src='images/placeholders/cover-default.jpg'">
+      <img src="${imgOrPlaceholder(book.image_path)}" alt="${book.title}" 
+           onerror="this.src='https://via.placeholder.com/280x320/3b82f6/ffffff?text=No+Cover'">
     </div>
     <div class="meta">
       <h3 class="title" title="${book.title}">${book.title}</h3>
       <p class="author">${book.author || "Unknown Author"}</p>
-      <p class="desc">${(book.description || "").slice(0, 80)}${
-    (book.description || "").length > 80 ? "…" : ""
-  }</p>
-      
+      <p class="desc">${(book.description || "No description available.").slice(0, 80)}${(book.description || "").length > 80 ? "…" : ""}</p>
       <div class="book-actions">
         <a class="btn small" href="book.html?id=${book.id}">📖 Read Now</a>
       </div>
@@ -66,6 +180,18 @@ function renderGrid(containerId, items) {
     return;
   }
   grid.innerHTML = "";
+  
+  if (items.length === 0) {
+    grid.innerHTML = `
+      <div class="no-books" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+        <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+        <h3>No books found</h3>
+        <p>Try adjusting your search or browse all books</p>
+      </div>
+    `;
+    return;
+  }
+  
   items.forEach((b) => grid.appendChild(renderBookCard(b)));
 }
 
@@ -113,9 +239,9 @@ function renderPagination({ total, page, page_size }, onJump) {
 const state = {
   q: "",
   sort: "id",
-  order: "desc",
+  order: "desc", 
   page: 1,
-  page_size: 18,
+  page_size: 8,
 };
 
 // ---------- Data fetchers ----------
@@ -128,12 +254,49 @@ async function fetchBooks() {
       page: state.page,
       page_size: state.page_size,
     });
+    
     const res = await fetch(`/api/books?${params.toString()}`);
-    if (!res.ok) throw new Error("API response not ok");
-    return await res.json();
+    
+    if (!res.ok) {
+      throw new Error(`API response not ok: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    return data;
+    
   } catch (error) {
     console.error("Error fetching books:", error);
+    
+    // Fallback: Show error message in UI
+    const grid = document.getElementById("booksGrid");
+    if (grid) {
+      grid.innerHTML = `
+        <div class="no-books" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+          <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+          <h3>Unable to load books</h3>
+          <p>Please check your connection and try again</p>
+          <button onclick="loadBooks()" class="btn small" style="margin-top: 16px;">Retry</button>
+        </div>
+      `;
+    }
+    
     return { items: [], total: 0 };
+  }
+}
+
+async function fetchBookById(id) {
+  try {
+    const res = await fetch(`/api/books/${id}`);
+    
+    if (!res.ok) {
+      throw new Error(`Book not found: ${res.status}`);
+    }
+    
+    return await res.json();
+    
+  } catch (error) {
+    console.error("Error fetching book:", error);
+    return null;
   }
 }
 
@@ -142,6 +305,8 @@ async function initHome() {
   console.log("🏠 Initializing home page...");
 
   await includePartials();
+  initHeaderScroll();
+  initHeroCarousel();
 
   // Smooth scrolling
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
@@ -161,7 +326,23 @@ async function initHome() {
   const searchMeta = document.getElementById("searchMeta");
 
   if (searchInput && searchBtn) {
-    document.getElementById("searchForm").addEventListener("submit", doSearch);
+    const doSearch = async () => {
+      state.q = searchInput.value.trim();
+      state.page = 1;
+      const result = await fetchBooks();
+      renderGrid("booksGrid", result.items);
+      renderPagination(result, jumpTo);
+      if (state.q && searchMeta) {
+        searchMeta.textContent = `Showing ${result.items.length} of ${result.total} results for "${state.q}".`;
+      } else if (searchMeta) {
+        searchMeta.textContent = "";
+      }
+    };
+
+    document.getElementById("searchForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      doSearch();
+    });
     searchBtn.addEventListener("click", doSearch);
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") doSearch();
@@ -190,24 +371,12 @@ async function initHome() {
     });
   }
 
-  async function doSearch() {
-    state.q = searchInput.value.trim();
-    state.page = 1;
-    const result = await fetchBooks();
-    renderGrid("booksGrid", result.items);
-    renderPagination(result, jumpTo);
-    if (state.q && searchMeta) {
-      searchMeta.textContent = `Showing ${result.items.length} of ${result.total} results for "${state.q}".`;
-    } else if (searchMeta) {
-      searchMeta.textContent = "";
-    }
-  }
-
   async function loadBooks() {
+    console.log("📚 Loading books...");
     const result = await fetchBooks();
     renderGrid("booksGrid", result.items);
     renderPagination(result, jumpTo);
-    console.log(`📚 Loaded ${result.items.length} books`);
+    console.log(`✅ Loaded ${result.items.length} books`);
   }
 
   async function jumpTo(p) {
@@ -226,36 +395,201 @@ async function initHome() {
 async function loadBook() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
+  
   if (!id) {
     document.getElementById("bookTitle").textContent = "Book ID not specified";
     return;
   }
 
   try {
-    const res = await fetch(`/api/books/${id}`);
-    if (!res.ok) {
+    // Show loading state
+    const pdfLoading = document.getElementById('pdfLoading');
+    const pdfCanvas = document.getElementById('pdfCanvas');
+    
+    if (pdfLoading) pdfLoading.style.display = 'flex';
+    if (pdfCanvas) pdfCanvas.style.display = 'none';
+
+    const book = await fetchBookById(id);
+    
+    if (!book) {
       document.getElementById("bookTitle").textContent = "Book not found";
+      if (pdfLoading) pdfLoading.style.display = 'none';
       return;
     }
 
-    const book = await res.json();
+    // Update book info
     document.getElementById("bookTitle").textContent = book.title;
-    document.getElementById("bookAuthor").textContent =
-      "by " + (book.author || "Unknown Author");
-    document.getElementById("bookDesc").textContent =
-      book.description || "No description available.";
-
-    // Load the PDF using PDF.js
-    loadPDF(book.pdf_path);
+    document.getElementById("bookAuthor").textContent = "by " + (book.author || "Unknown Author");
+    document.getElementById("bookDesc").textContent = book.description || "No description available.";
 
     // Set download link
     const downloadBtn = document.getElementById("downloadBtn");
-    downloadBtn.href = book.pdf_path;
-    downloadBtn.textContent = `Download "${book.title}" PDF`;
-    downloadBtn.setAttribute("download", book.title + ".pdf");
+    if (downloadBtn && book.pdf_path) {
+      downloadBtn.href = book.pdf_path;
+      downloadBtn.setAttribute("download", `${book.title}.pdf`);
+    }
+
+    // Load PDF if path exists
+    if (book.pdf_path) {
+      await loadPDF(book.pdf_path);
+    } else {
+      if (pdfLoading) {
+        pdfLoading.innerHTML = `
+          <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+            <h3>PDF Not Available</h3>
+            <p>This book doesn't have a PDF file yet.</p>
+          </div>
+        `;
+      }
+    }
+
   } catch (error) {
     console.error("Error loading book:", error);
     document.getElementById("bookTitle").textContent = "Error loading book";
+    const pdfLoading = document.getElementById('pdfLoading');
+    if (pdfLoading) {
+      pdfLoading.style.display = 'none';
+    }
+  }
+}
+
+// ---------- PDF.js Viewer ----------
+let pdfDoc = null;
+let pageNum = 1;
+let pageRendering = false;
+let pageNumPending = null;
+const scale = 1.5;
+
+function initPDFViewer() {
+  // Set up PDF.js worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+
+  // Set up page controls
+  const prevPageBtn = document.getElementById("prevPage");
+  const nextPageBtn = document.getElementById("nextPage");
+  const goToPageBtn = document.getElementById("goToPage");
+  const pageJumpInput = document.getElementById("pageJump");
+
+  if (prevPageBtn) prevPageBtn.addEventListener("click", onPrevPage);
+  if (nextPageBtn) nextPageBtn.addEventListener("click", onNextPage);
+  if (goToPageBtn) goToPageBtn.addEventListener("click", onGoToPage);
+  if (pageJumpInput) {
+    pageJumpInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") onGoToPage();
+    });
+  }
+}
+
+function loadPDF(pdfUrl) {
+  // Initialize PDF viewer first
+  initPDFViewer();
+
+  // Show loading state
+  const pdfLoading = document.getElementById('pdfLoading');
+  const pdfCanvas = document.getElementById('pdfCanvas');
+  
+  if (pdfLoading) pdfLoading.style.display = 'flex';
+  if (pdfCanvas) pdfCanvas.style.display = 'none';
+
+  // Load the PDF
+  const loadingTask = pdfjsLib.getDocument(pdfUrl);
+  
+  loadingTask.promise.then(function(pdfDoc_) {
+    pdfDoc = pdfDoc_;
+    
+    // Set total pages
+    document.getElementById("totalPages").textContent = pdfDoc.numPages;
+    
+    // Render first page
+    renderPage(pageNum);
+    
+  }).catch(function(error) {
+    console.error("Error loading PDF:", error);
+    
+    if (pdfLoading) {
+      pdfLoading.innerHTML = `
+        <div style="text-align: center; color: var(--muted);">
+          <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+          <h3>Error Loading PDF</h3>
+          <p>Could not load the PDF file.</p>
+          <button onclick="window.history.back()" class="btn small" style="margin-top: 16px;">
+            ← Back to Library
+          </button>
+        </div>
+      `;
+    }
+  });
+}
+
+function renderPage(num) {
+  pageRendering = true;
+
+  pdfDoc.getPage(num).then(function(page) {
+    const canvas = document.getElementById("pdfCanvas");
+    const ctx = canvas.getContext("2d");
+    const viewport = page.getViewport({ scale: scale });
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderContext = {
+      canvasContext: ctx,
+      viewport: viewport,
+    };
+
+    const renderTask = page.render(renderContext);
+
+    renderTask.promise.then(function() {
+      pageRendering = false;
+
+      // Hide loading and show canvas
+      const pdfLoading = document.getElementById('pdfLoading');
+      const pdfCanvas = document.getElementById('pdfCanvas');
+      
+      if (pdfLoading) pdfLoading.style.display = 'none';
+      if (pdfCanvas) pdfCanvas.style.display = 'block';
+
+      // Update page info
+      document.getElementById("currentPage").textContent = num;
+      document.getElementById("totalPages").textContent = pdfDoc.numPages;
+
+      if (pageNumPending !== null) {
+        renderPage(pageNumPending);
+        pageNumPending = null;
+      }
+    });
+  });
+}
+
+function queueRenderPage(num) {
+  if (pageRendering) {
+    pageNumPending = num;
+  } else {
+    renderPage(num);
+  }
+}
+
+function onPrevPage() {
+  if (pageNum <= 1) return;
+  pageNum--;
+  queueRenderPage(pageNum);
+}
+
+function onNextPage() {
+  if (pageNum >= pdfDoc.numPages) return;
+  pageNum++;
+  queueRenderPage(pageNum);
+}
+
+function onGoToPage() {
+  const input = document.getElementById("pageJump");
+  const num = parseInt(input.value);
+
+  if (num >= 1 && num <= pdfDoc.numPages) {
+    pageNum = num;
+    queueRenderPage(pageNum);
+    input.value = "";
   }
 }
 
@@ -270,290 +604,6 @@ function initBookPage() {
 
   // Load the book data
   loadBook();
-}
-
-// ---------- PDF.js Viewer ----------
-// ---------- PDF.js Viewer ----------
-let pdfDoc = null;
-let pageNum = 1;
-let pageRendering = false;
-let pageNumPending = null;
-const scale = 1.5;
-
-function initPDFViewer() {
-  // Set up PDF.js worker
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
-
-  // Set up page controls - TOP
-  document.getElementById("prevPage").addEventListener("click", onPrevPage);
-  document.getElementById("nextPage").addEventListener("click", onNextPage);
-  document.getElementById("goToPage").addEventListener("click", onGoToPage);
-  document.getElementById("pageJump").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") onGoToPage();
-  });
-
-  // Set up page controls - BOTTOM
-  document
-    .getElementById("prevPageBottom")
-    .addEventListener("click", onPrevPage);
-  document
-    .getElementById("nextPageBottom")
-    .addEventListener("click", onNextPage);
-  document
-    .getElementById("goToPageBottom")
-    .addEventListener("click", onGoToPageBottom);
-  document
-    .getElementById("pageJumpBottom")
-    .addEventListener("keypress", (e) => {
-      if (e.key === "Enter") onGoToPageBottom();
-    });
-}
-
-function loadPDF(pdfUrl) {
-  // Show loading state
-  document.getElementById('pdfCanvas').innerHTML = `
-    <div style="text-align: center; padding: 50px; color: var(--muted);">
-      <div style="font-size: 24px; margin-bottom: 20px;">📖</div>
-      <h3>Loading PDF...</h3>
-      <p>Please wait while the book loads</p>
-      <div style="width: 100px; height: 4px; background: var(--stroke); border-radius: 2px; margin: 20px auto;">
-        <div style="width: 100%; height: 100%; background: var(--brand); border-radius: 2px; animation: loading 2s infinite;"></div>
-      </div>
-    </div>
-  `;
-
-  // Add loading animation to CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes loading {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-  `;
-  document.head.appendChild(style);
-
-  // Initialize PDF viewer first
-  initPDFViewer();
-
-  // Then load the PDF with better error handling
-  const loadingTask = pdfjsLib.getDocument({
-    url: pdfUrl,
-    verbosity: 0,
-  });
-
-  // Set timeout for large files (30 seconds)
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('PDF loading timeout - File might be too large')), 30000);
-  });
-
-  Promise.race([loadingTask.promise, timeoutPromise])
-    .then(function (pdfDoc_) {
-      pdfDoc = pdfDoc_;
-
-      // Set total pages for both top and bottom
-      document.getElementById("totalPages").textContent = pdfDoc.numPages;
-      document.getElementById("totalPagesBottom").textContent = pdfDoc.numPages;
-
-      // Render first page
-      renderPage(pageNum);
-    })
-    .catch(function (error) {
-      console.error("Error loading PDF:", error);
-      showPDFError(pdfUrl, error.message);
-    });
-}
-
-function showPDFError(pdfUrl, errorMsg) {
-  document.getElementById("pdfCanvas").innerHTML = `
-    <div style="text-align: center; padding: 50px; color: var(--muted);">
-      <div style="font-size: 48px; margin-bottom: 20px;">📄❌</div>
-      <h3>Couldn't Load PDF</h3>
-      <p>Error: ${errorMsg}</p>
-      <p>The file might be too large or unavailable.</p>
-      <div style="margin-top: 20px;">
-        <a href="${pdfUrl}" class="btn primary" download style="margin: 5px;">
-          📥 Download PDF
-        </a>
-        <button onclick="window.history.back()" class="btn ghost" style="margin: 5px;">
-          ← Back to Library
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// The rest of your existing PDF functions remain the same...
-function renderPage(num) {
-  pageRendering = true;
-
-  pdfDoc.getPage(num).then(function (page) {
-    const canvas = document.getElementById("pdfCanvas");
-    const ctx = canvas.getContext("2d");
-    const viewport = page.getViewport({ scale: scale });
-
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    const renderContext = {
-      canvasContext: ctx,
-      viewport: viewport,
-    };
-
-    const renderTask = page.render(renderContext);
-
-    renderTask.promise.then(function () {
-      pageRendering = false;
-
-      // Update both top and bottom page info
-      document.getElementById("currentPage").textContent = num;
-      document.getElementById("currentPageBottom").textContent = num;
-      document.getElementById("totalPages").textContent = pdfDoc.numPages;
-      document.getElementById("totalPagesBottom").textContent = pdfDoc.numPages;
-
-      if (pageNumPending !== null) {
-        renderPage(pageNumPending);
-        pageNumPending = null;
-      }
-    });
-  });
-}
-
-function queueRenderPage(num) {
-  if (pageRendering) {
-    pageNumPending = num;
-  } else {
-    renderPage(num);
-  }
-}
-
-function onPrevPage() {
-  if (pageNum <= 1) return;
-  pageNum--;
-  queueRenderPage(pageNum);
-}
-
-function onNextPage() {
-  if (pageNum >= pdfDoc.numPages) return;
-  pageNum++;
-  queueRenderPage(pageNum);
-}
-
-function onGoToPage() {
-  const input = document.getElementById("pageJump");
-  const num = parseInt(input.value);
-
-  if (num >= 1 && num <= pdfDoc.numPages) {
-    pageNum = num;
-    queueRenderPage(pageNum);
-    input.value = "";
-  }
-}
-
-function onGoToPageBottom() {
-  const input = document.getElementById("pageJumpBottom");
-  const num = parseInt(input.value);
-
-  if (num >= 1 && num <= pdfDoc.numPages) {
-    pageNum = num;
-    queueRenderPage(pageNum);
-    input.value = "";
-  }
-}
-
-// Update page info for both top and bottom
-function renderPage(num) {
-  pageRendering = true;
-
-  pdfDoc.getPage(num).then(function (page) {
-    const canvas = document.getElementById("pdfCanvas");
-    const ctx = canvas.getContext("2d");
-    const viewport = page.getViewport({ scale: scale });
-
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    const renderContext = {
-      canvasContext: ctx,
-      viewport: viewport,
-    };
-
-    const renderTask = page.render(renderContext);
-
-    renderTask.promise.then(function () {
-      pageRendering = false;
-
-      // Update both top and bottom page info
-      document.getElementById("currentPage").textContent = num;
-      document.getElementById("currentPageBottom").textContent = num;
-      document.getElementById("totalPages").textContent = pdfDoc.numPages;
-      document.getElementById("totalPagesBottom").textContent = pdfDoc.numPages;
-
-      if (pageNumPending !== null) {
-        renderPage(pageNumPending);
-        pageNumPending = null;
-      }
-    });
-  });
-}
-
-function queueRenderPage(num) {
-  if (pageRendering) {
-    pageNumPending = num;
-  } else {
-    renderPage(num);
-  }
-}
-
-function onPrevPage() {
-  if (pageNum <= 1) return;
-  pageNum--;
-  queueRenderPage(pageNum);
-}
-
-function onNextPage() {
-  if (pageNum >= pdfDoc.numPages) return;
-  pageNum++;
-  queueRenderPage(pageNum);
-}
-
-function onGoToPage() {
-  const input = document.getElementById("pageJump");
-  const num = parseInt(input.value);
-
-  if (num >= 1 && num <= pdfDoc.numPages) {
-    pageNum = num;
-    queueRenderPage(pageNum);
-    input.value = "";
-  }
-}
-
-function loadPDF(pdfUrl) {
-  // Initialize PDF viewer first
-  initPDFViewer();
-
-  // Then load the PDF
-  pdfjsLib
-    .getDocument(pdfUrl)
-    .promise.then(function (pdfDoc_) {
-      pdfDoc = pdfDoc_;
-
-      // Set total pages for both top and bottom
-      document.getElementById("totalPages").textContent = pdfDoc.numPages;
-      document.getElementById("totalPagesBottom").textContent = pdfDoc.numPages;
-
-      // Render first page
-      renderPage(pageNum);
-    })
-    .catch(function (error) {
-      console.error("Error loading PDF:", error);
-      document.getElementById("pdfCanvas").innerHTML = `
-      <div style="text-align: center; padding: 50px; color: var(--muted);">
-        <h3>Error loading PDF</h3>
-        <p>Could not load the PDF file. <a href="${pdfUrl}" class="btn small">Download instead</a></p>
-      </div>
-    `;
-    });
 }
 
 // ---------- Page Router ----------

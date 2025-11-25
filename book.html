@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Books</title>
+  <title>Book Reader - Online Library</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
   <!-- Add PDF.js -->
@@ -13,34 +13,70 @@
 
   <main class="container">
     <div id="bookDetails" class="book-details">
-      <div class="book-meta">
-        <h1 id="bookTitle">Loading...</h1>
-        <p id="bookAuthor"></p>
-        <p id="bookDesc"></p>
-        <div class="book-actions">
-          <button id="backBtn" class="btn ghost">← Back to Library</button>
-          <a id="downloadBtn" class="btn">Download PDF</a>
-          <!-- Top Navigation -->
-          <div class="pdf-controls">
-            <button id="prevPage" class="btn ghost small">Previous</button>
-            <span id="pageInfo">Page: <span id="currentPage">1</span> / <span id="totalPages">0</span></span>
-            <button id="nextPage" class="btn ghost small">Next</button>
-            <input type="number" id="pageJump" placeholder="Go to page" min="1" style="width: 80px; padding: 5px; background: #0b1224; color: var(--text); border: 1px solid var(--stroke); border-radius: 5px;">
-            <button id="goToPage" class="btn ghost small">Go</button>
-          </div>
+      <!-- Book Header Section -->
+      <div class="book-header card">
+        <div class="header-top">
+          <button id="backBtn" class="btn ghost small back-btn">
+            <span class="btn-icon">←</span>
+            Back to Library
+          </button>
+          <a id="downloadBtn" class="btn primary download-btn">
+            <span class="btn-icon">📥</span>
+            Download PDF
+          </a>
+        </div>
+        
+        <div class="book-info">
+          <h1 id="bookTitle" class="book-title">Loading...</h1>
+          <p id="bookAuthor" class="book-author"></p>
+          <p id="bookDesc" class="book-desc"></p>
         </div>
       </div>
-      
-      <div class="pdf-viewer">
-        <canvas id="pdfCanvas"></canvas>
-        
-        <!-- Bottom Navigation -->
-        <div class="pdf-controls bottom-controls">
-          <button id="prevPageBottom" class="btn ghost small">Previous</button>
-          <span id="pageInfoBottom">Page: <span id="currentPageBottom">1</span> / <span id="totalPagesBottom">0</span></span>
-          <button id="nextPageBottom" class="btn ghost small">Next</button>
-          <input type="number" id="pageJumpBottom" placeholder="Go to page" min="1" style="width: 80px; padding: 5px; background: #0b1224; color: var(--text); border: 1px solid var(--stroke); border-radius: 5px;">
-          <button id="goToPageBottom" class="btn ghost small">Go</button>
+
+      <!-- PDF Viewer Section -->
+      <div class="pdf-viewer-section">
+        <!-- PDF Controls - Top Only -->
+        <div class="pdf-controls card">
+          <div class="controls-group">
+            <button id="prevPage" class="btn ghost small control-btn">
+              <span class="btn-icon">◀</span>
+              Previous
+            </button>
+            
+            <div class="page-info">
+              <span class="page-text">Page</span>
+              <span id="currentPage" class="current-page">1</span>
+              <span class="page-separator">of</span>
+              <span id="totalPages" class="total-pages">0</span>
+            </div>
+            
+            <button id="nextPage" class="btn ghost small control-btn">
+              Next
+              <span class="btn-icon">▶</span>
+            </button>
+          </div>
+          
+          <div class="page-jump-group">
+            <input 
+              type="number" 
+              id="pageJump" 
+              placeholder="Go to page" 
+              min="1" 
+              class="page-input"
+            >
+            <button id="goToPage" class="btn primary small go-btn">
+              Go
+            </button>
+          </div>
+        </div>
+
+        <!-- PDF Canvas -->
+        <div class="pdf-canvas-container">
+          <canvas id="pdfCanvas" class="pdf-canvas"></canvas>
+          <div id="pdfLoading" class="pdf-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading PDF...</p>
+          </div>
         </div>
       </div>
     </div>

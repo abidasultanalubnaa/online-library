@@ -21,9 +21,11 @@ def get_scalar(sql, params=()):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(sql, params)
-    (val,) = cur.fetchone()
+    result = cur.fetchone()
     conn.close()
-    return val
+    if result:
+        return result[0]
+    return 0
 
 @app.after_request
 def add_header(response):
@@ -42,14 +44,14 @@ def home():
 def api_books():
     # query params
     q = request.args.get('q', '', type=str).strip()
-    sort = request.args.get('sort', 'title', type=str).lower()      # title|author|id
-    order = request.args.get('order', 'asc', type=str).lower()      # asc|desc
+    sort = request.args.get('sort', 'id', type=str).lower()      # title|author|id
+    order = request.args.get('order', 'desc', type=str).lower()  # asc|desc
     page = max(1, request.args.get('page', 1, type=int))
-    page_size = min(48, max(1, request.args.get('page_size', 12, type=int)))
+    page_size = min(48, max(1, request.args.get('page_size', 8, type=int)))
 
     # whitelisted sort columns
-    sort_col = 'title' if sort not in ('id','title','author') else sort
-    order_dir = 'ASC' if order != 'desc' else 'DESC'
+    sort_col = 'id' if sort not in ('id','title','author') else sort
+    order_dir = 'ASC' if order == 'asc' else 'DESC'
 
     where = ""
     params = []
@@ -80,19 +82,7 @@ def api_books():
         "items": data
     })
 
-# ---------- API: Popular (random) ----------
-@app.route('/api/books/random')
-def api_books_random():
-    limit = min(24, max(1, request.args.get('limit', 8, type=int)))
-    data = query_db(f"""
-        SELECT id, title, author, description, pdf_path, image_path
-        FROM books
-        ORDER BY RANDOM()
-        LIMIT ?
-    """, (limit,))
-    return jsonify({"items": data})
-
-# ---------- API: Single book (for book.html later) ----------
+# ---------- API: Single book (for book.html) ----------
 @app.route('/api/books/<int:book_id>')
 def api_book_one(book_id):
     rows = query_db("""
@@ -109,4 +99,4 @@ def static_proxy(path):
     return send_from_directory(app.static_folder, path)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
